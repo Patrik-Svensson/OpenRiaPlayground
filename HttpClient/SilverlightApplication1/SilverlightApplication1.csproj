@@ -33,7 +33,8 @@
     </LinkedServerProject>
     <LinkedOpenRiaServerProject>..\SilverlightApplication1.Web\SilverlightApplication1.Web.csproj</LinkedOpenRiaServerProject>
     <OpenRiaClientUseFullTypeNames>true</OpenRiaClientUseFullTypeNames>
-    <NuGetPackageImportStamp>f9b601ab</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <!-- This property group is only here to support building this project using the 
        MSBuild 3.5 toolset. In order to work correctly with this older toolset, it needs 
@@ -80,13 +81,13 @@
       <HintPath>..\packages\OpenRiaServices.ViewModel.4.4.0.3\lib\sl50\OpenRiaServices.Data.DomainServices.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="OpenRiaServices.DomainServices.Client, Version=2.0.5.0, Culture=neutral, PublicKeyToken=2e0b7ccb1ae5b4c8, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\OpenRiaServices.Client.Core.4.4.0.3\lib\sl50\OpenRiaServices.DomainServices.Client.dll</HintPath>
+    <Reference Include="OpenRiaServices.DomainServices.Client, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenRiaServices.Client.Core.4.5.0-beta1\lib\sl50\OpenRiaServices.DomainServices.Client.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="OpenRiaServices.DomainServices.Client.Web, Version=2.0.5.0, Culture=neutral, PublicKeyToken=2e0b7ccb1ae5b4c8, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\OpenRiaServices.Client.Core.4.4.0.3\lib\sl50\OpenRiaServices.DomainServices.Client.Web.dll</HintPath>
+    <Reference Include="OpenRiaServices.DomainServices.Client.Web, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenRiaServices.Client.Core.4.5.0-beta1\lib\sl50\OpenRiaServices.DomainServices.Client.Web.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations, Version=5.0.5.0, Culture=neutral, PublicKeyToken=ddd0da4d3e678217, processorArchitecture=MSIL" />
     <Reference Include="System.IO, Version=1.5.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -146,6 +147,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -166,13 +168,12 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Import Project="..\packages\OpenRiaServices.Client.CodeGen.4.4.0.3\build\OpenRiaServices.Client.CodeGen.targets" Condition="Exists('..\packages\OpenRiaServices.Client.CodeGen.4.4.0.3\build\OpenRiaServices.Client.CodeGen.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\OpenRiaServices.Client.CodeGen.4.4.0.3\build\OpenRiaServices.Client.CodeGen.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenRiaServices.Client.CodeGen.4.4.0.3\build\OpenRiaServices.Client.CodeGen.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+    <Error Condition="!Exists('..\packages\OpenRiaServices.Client.CodeGen.4.4.1.0\build\OpenRiaServices.Client.CodeGen.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenRiaServices.Client.CodeGen.4.4.1.0\build\OpenRiaServices.Client.CodeGen.targets'))" />
   </Target>
   <ProjectExtensions>
     <VisualStudio>
@@ -182,4 +183,5 @@
     </VisualStudio>
   </ProjectExtensions>
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Import Project="..\packages\OpenRiaServices.Client.CodeGen.4.4.1.0\build\OpenRiaServices.Client.CodeGen.targets" Condition="Exists('..\packages\OpenRiaServices.Client.CodeGen.4.4.1.0\build\OpenRiaServices.Client.CodeGen.targets')" />
 </Project>

@@ -41,21 +41,18 @@ namespace WpfWithPortable
             {
                 HttpClientHandler = new HttpClientHandler()
                 {
-//                    Proxy = new Proxy(new Uri("http://localhost:8888")),
                     UseProxy = true,
                     AutomaticDecompression = System.Net.DecompressionMethods.Deflate | System.Net.DecompressionMethods.GZip
                 },
-                ServerBaseUri = new Uri("http://localhost.fiddler:51359/ClientBin/", UriKind.Absolute)
+                // Uncomment this to debug in fiddler
+                // ServerBaseUri = new Uri("http://localhost.fiddler:51359/ClientBin/", UriKind.Absolute)
+                ServerBaseUri = new Uri("http://localhost:51359/ClientBin/", UriKind.Absolute)
             };
 
             // Create a WebContext and add it to the ApplicationLifetimeObjects collection.
             // This will then be available as WebContext.Current.
             WebContext webContext = new WebContext();
-            webContext.Authentication = new FormsAuthentication()
-            {
-                DomainContext = new SilverlightApplication1.Web.AuthenticationDomainService1()
-            };
-            //webContext.Authentication = new WindowsAuthentication();
+            webContext.Authentication = new FormsAuthentication();
         }
     }
 }
