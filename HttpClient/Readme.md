@@ -6,9 +6,5 @@
 
 ## IMPORTANT:
 
-
-1. \packages\OpenRiaServices.Client.Core.4.4.0.3 is not the standard nuget package but a modified version based on
-https://openriaservices.codeplex.com/SourceControl/network/forks/danneesset/openriaservices?branch=domainclientfactory
-
-2. The client URI for non-SL clients are configured so that you must install and run Fiddler (http://www.telerik.com/fiddler) while debugging 
-(they use localhost.fiddler instead of just localhost).
+1. To capture the communication for non-SL clients you you can use Fiddler (http://www.telerik.com/fiddler) while debugging 
+but then you should change the server uri to use _localhost.fiddler_ instead of just _localhost_.
