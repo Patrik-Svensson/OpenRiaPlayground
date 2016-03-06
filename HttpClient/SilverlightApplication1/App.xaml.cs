@@ -27,8 +27,13 @@ namespace SilverlightApplication1
 
             InitializeComponent();
 
-
+            /*
             DomainContext.DomainClientFactory = new HttpClient::OpenRiaServices.DomainServices.Client.PortableWeb.WebApiDomainClientFactory()
+            {
+                ServerBaseUri = Application.Current.Host.Source,
+            };*/
+
+            DomainContext.DomainClientFactory = new OpenRiaServices.DomainServices.Client.Web.WebDomainClientFactory()
             {
                 ServerBaseUri = Application.Current.Host.Source,
             };

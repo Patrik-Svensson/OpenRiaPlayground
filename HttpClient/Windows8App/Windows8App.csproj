@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{27761404-253D-49A1-8F5A-0BBB4D24C512}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
-	<!-- TODO: REMOVE THIS AND CHECK FOR OUTPUT TYPE INSTEAD-->
-	<SilverlightApplication>true</SilverlightApplication>
+    <!-- TODO: REMOVE THIS AND CHECK FOR OUTPUT TYPE INSTEAD-->
+    <SilverlightApplication>true</SilverlightApplication>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Windows8App</RootNamespace>
     <AssemblyName>Windows8App</AssemblyName>
@@ -18,7 +18,9 @@
     <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PackageCertificateKeyFile>Windows8App_TemporaryKey.pfx</PackageCertificateKeyFile>
     <LinkedOpenRiaServerProject>..\SilverlightApplication1.Web\SilverlightApplication1.Web.csproj</LinkedOpenRiaServerProject>
-    <NuGetPackageImportStamp>9399c3fb</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <PackageCertificateThumbprint>546BCFCD693AE7C7505A2CBB5E7A0954656DBE6E</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -141,19 +143,11 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\netcore45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="OpenRiaServices.DomainServices.Client">
-      <HintPath>..\packages\OpenRiaServices.Client.Core.4.4.0.3\lib\portable-net45+sl5+win8\OpenRiaServices.DomainServices.Client.dll</HintPath>
+      <HintPath>..\packages\OpenRiaServices.Client.Core.4.5.0-beta2\lib\portable-net45+sl5+win8\OpenRiaServices.DomainServices.Client.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http.Extensions, Version=2.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Net.Http.2.2.29\lib\win8\System.Net.Http.Extensions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\portable-wp8+netcore45+net45+wp81+wpa81\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Net.Http.Primitives, Version=4.2.29.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -178,13 +172,12 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Import Project="..\packages\OpenRiaServices.Client.CodeGen.4.4.0.3\build\OpenRiaServices.Client.CodeGen.targets" Condition="Exists('..\packages\OpenRiaServices.Client.CodeGen.4.4.0.3\build\OpenRiaServices.Client.CodeGen.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\OpenRiaServices.Client.CodeGen.4.4.0.3\build\OpenRiaServices.Client.CodeGen.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenRiaServices.Client.CodeGen.4.4.0.3\build\OpenRiaServices.Client.CodeGen.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
+    <Error Condition="!Exists('..\packages\OpenRiaServices.Client.CodeGen.4.4.1.1\build\OpenRiaServices.Client.CodeGen.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenRiaServices.Client.CodeGen.4.4.1.1\build\OpenRiaServices.Client.CodeGen.targets'))" />
   </Target>
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">
@@ -192,4 +185,5 @@
     <Error Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" Text="The build restored NuGet packages. Build the project again to include these packages in the build. For more information, see http://go.microsoft.com/fwlink/?LinkID=317568." HelpKeyword="BCLBUILD2002" />
   </Target>
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
+  <Import Project="..\packages\OpenRiaServices.Client.CodeGen.4.4.1.1\build\OpenRiaServices.Client.CodeGen.targets" Condition="Exists('..\packages\OpenRiaServices.Client.CodeGen.4.4.1.1\build\OpenRiaServices.Client.CodeGen.targets')" />
 </Project>
