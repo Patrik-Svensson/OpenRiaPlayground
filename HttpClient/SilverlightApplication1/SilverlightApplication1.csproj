@@ -82,11 +82,11 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="OpenRiaServices.DomainServices.Client, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenRiaServices.Client.Core.4.5.0-beta2\lib\sl50\OpenRiaServices.DomainServices.Client.dll</HintPath>
+      <HintPath>..\packages\OpenRiaServices.Client.Core.4.5.0-beta3\lib\sl50\OpenRiaServices.DomainServices.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="OpenRiaServices.DomainServices.Client.Web, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenRiaServices.Client.Core.4.5.0-beta2\lib\sl50\OpenRiaServices.DomainServices.Client.Web.dll</HintPath>
+      <HintPath>..\packages\OpenRiaServices.Client.Core.4.5.0-beta3\lib\sl50\OpenRiaServices.DomainServices.Client.Web.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations, Version=5.0.5.0, Culture=neutral, PublicKeyToken=ddd0da4d3e678217, processorArchitecture=MSIL" />
@@ -173,7 +173,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
-    <Error Condition="!Exists('..\packages\OpenRiaServices.Client.CodeGen.4.4.1.1\build\OpenRiaServices.Client.CodeGen.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenRiaServices.Client.CodeGen.4.4.1.1\build\OpenRiaServices.Client.CodeGen.targets'))" />
+    <Error Condition="!Exists('..\packages\OpenRiaServices.Client.CodeGen.4.5.0-beta3\build\OpenRiaServices.Client.CodeGen.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenRiaServices.Client.CodeGen.4.5.0-beta3\build\OpenRiaServices.Client.CodeGen.targets'))" />
   </Target>
   <ProjectExtensions>
     <VisualStudio>
@@ -183,5 +183,5 @@
     </VisualStudio>
   </ProjectExtensions>
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
-  <Import Project="..\packages\OpenRiaServices.Client.CodeGen.4.4.1.1\build\OpenRiaServices.Client.CodeGen.targets" Condition="Exists('..\packages\OpenRiaServices.Client.CodeGen.4.4.1.1\build\OpenRiaServices.Client.CodeGen.targets')" />
+  <Import Project="..\packages\OpenRiaServices.Client.CodeGen.4.5.0-beta3\build\OpenRiaServices.Client.CodeGen.targets" Condition="Exists('..\packages\OpenRiaServices.Client.CodeGen.4.5.0-beta3\build\OpenRiaServices.Client.CodeGen.targets')" />
 </Project>

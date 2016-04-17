@@ -27,7 +27,14 @@ namespace SilverlightApplication1
 
             InitializeComponent();
 
-            /*
+
+            bool httpResult = WebRequest.RegisterPrefix("http://", System.Net.Browser.WebRequestCreator.ClientHttp);
+
+        }
+
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+                        /*
             DomainContext.DomainClientFactory = new HttpClient::OpenRiaServices.DomainServices.Client.PortableWeb.WebApiDomainClientFactory()
             {
                 ServerBaseUri = Application.Current.Host.Source,
@@ -35,7 +42,7 @@ namespace SilverlightApplication1
 
             DomainContext.DomainClientFactory = new OpenRiaServices.DomainServices.Client.Web.WebDomainClientFactory()
             {
-                ServerBaseUri = Application.Current.Host.Source,
+                
             };
 
             // Create a WebContext and add it to the ApplicationLifetimeObjects collection.
@@ -43,10 +50,7 @@ namespace SilverlightApplication1
             WebContext webContext = new WebContext();
             webContext.Authentication = new FormsAuthentication();
             //webContext.Authentication = new WindowsAuthentication();
-        }
 
-        private void Application_Startup(object sender, StartupEventArgs e)
-        {
             Resources.Add("WebContext", WebContext.Current);
 
             this.RootVisual = new MainPage();

@@ -37,6 +37,12 @@ namespace WpfWithPortable
         //        else
         //            MessageBox.Show(string.Format("User loaded: Identity = {0}, authentication = {1}", res.User.Identity, res.User.Identity.IsAuthenticated));
         //    }, null);
+
+            this.Startup += App_Startup;
+        }
+
+        private void App_Startup(object sender, StartupEventArgs e)
+        {
             DomainContext.DomainClientFactory = new WebApiDomainClientFactory()
             {
                 HttpClientHandler = new HttpClientHandler()
@@ -44,6 +50,13 @@ namespace WpfWithPortable
                     UseProxy = true,
                     AutomaticDecompression = System.Net.DecompressionMethods.Deflate | System.Net.DecompressionMethods.GZip
                 },
+                // Uncomment this to debug in fiddler
+                // ServerBaseUri = new Uri("http://localhost.fiddler:51359/ClientBin/", UriKind.Absolute)
+                ServerBaseUri = new Uri("http://localhost:51359/ClientBin/", UriKind.Absolute)
+            };
+
+            DomainContext.DomainClientFactory = new OpenRiaServices.DomainServices.Client.Web.WebDomainClientFactory()
+            {
                 // Uncomment this to debug in fiddler
                 // ServerBaseUri = new Uri("http://localhost.fiddler:51359/ClientBin/", UriKind.Absolute)
                 ServerBaseUri = new Uri("http://localhost:51359/ClientBin/", UriKind.Absolute)

@@ -4,21 +4,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilverlightApplication1", "SilverlightApplication1\SilverlightApplication1.csproj", "{842F7A62-A0E3-4B18-837E-155CA167D513}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F5B520B1-798B-4CDA-B42E-3786260725F0} = {F5B520B1-798B-4CDA-B42E-3786260725F0}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SilverlightApplication1.Web", "SilverlightApplication1.Web\SilverlightApplication1.Web.csproj", "{F5B520B1-798B-4CDA-B42E-3786260725F0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Windows8App", "Windows8App\Windows8App.csproj", "{27761404-253D-49A1-8F5A-0BBB4D24C512}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F5B520B1-798B-4CDA-B42E-3786260725F0} = {F5B520B1-798B-4CDA-B42E-3786260725F0}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfClient", "WpfClient\WpfClient.csproj", "{1CE6A6DA-3F5F-407F-ADB0-F4BD074AA571}"
-	ProjectSection(ProjectDependencies) = postProject
-		{F5B520B1-798B-4CDA-B42E-3786260725F0} = {F5B520B1-798B-4CDA-B42E-3786260725F0}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenRiaServices.DomainServices.PortableWeb", "OpenRiaServices.DomainServices.PortableWeb\OpenRiaServices.DomainServices.PortableWeb.csproj", "{EFF65711-AF05-4939-86D6-2BBBFB24DC04}"
 EndProject
