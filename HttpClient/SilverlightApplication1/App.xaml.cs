@@ -42,7 +42,7 @@ namespace SilverlightApplication1
 
             DomainContext.DomainClientFactory = new OpenRiaServices.DomainServices.Client.Web.WebDomainClientFactory()
             {
-                
+                CookieContainer = new CookieContainer()
             };
 
             // Create a WebContext and add it to the ApplicationLifetimeObjects collection.

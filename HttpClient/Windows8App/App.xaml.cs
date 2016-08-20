@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
+using OpenRiaServices.DomainServices.Client;
 using OpenRiaServices.DomainServices.Client.ApplicationServices;
 using OpenRiaServices.DomainServices.Client.PortableWeb;
 using SilverlightApplication1.Web;
@@ -42,17 +43,23 @@ namespace Windows8App
             {
                 HttpClientHandler =  new HttpClientHandler()
                 {
-                    Proxy = new Proxy(new Uri("http://localhost:8888")),
-                    UseProxy = true,
+                    //Proxy = new Proxy(new Uri("http://localhost:8888")),
+                    //UseProxy = true,
                     AutomaticDecompression = System.Net.DecompressionMethods.Deflate | System.Net.DecompressionMethods.GZip
                 },
-                ServerBaseUri = new Uri("http://localhost.fiddler:51359/ClientBin/", UriKind.Absolute)
+                //ServerBaseUri = new Uri("http://localhost.fiddler:51359/ClientBin/", UriKind.Absolute)
+                ServerBaseUri = new Uri("http://localhost:51359/ClientBin/", UriKind.Absolute)
             };
+
+            DomainContext.DomainClientFactory = DomainClientFactory;
 
             // Create a WebContext and add it to the ApplicationLifetimeObjects collection.
             // This will then be available as WebContext.Current.
             WebContext webContext = new WebContext();
-            webContext.Authentication = new FormsAuthentication();
+            webContext.Authentication = new FormsAuthentication()
+            {
+                DomainContext = new AuthenticationDomainService1()
+            };
             //webContext.Authentication = new WindowsAuthentication();
         }
 

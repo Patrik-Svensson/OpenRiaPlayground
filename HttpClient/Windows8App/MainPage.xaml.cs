@@ -62,9 +62,7 @@ namespace Windows8App
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        readonly ServerSideAsyncDomainContext _ctx = new ServerSideAsyncDomainContext(
-            App.DomainClientFactory.CreateDomainClient(typeof(ServerSideAsyncDomainContext.IServerSideAsyncDomainServiceContract),
-                            new Uri(@"TestDomainServices-ServerSideAsyncDomainService.svc", UriKind.Relative), false));
+        readonly ServerSideAsyncDomainContext _ctx = new ServerSideAsyncDomainContext();
 
         public MainPage()
         {
