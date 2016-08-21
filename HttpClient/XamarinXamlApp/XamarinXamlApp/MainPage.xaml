@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:XamarinXamlApp"
+             x:Class="XamarinXamlApp.MainPage">
+
+
+  <Grid x:Name="LayoutRoot">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="37*"/>
+      <ColumnDefinition Width="43*"/>
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
+    </Grid.RowDefinitions>
+
+    <Label x:Name="txt" Text="Status1:" Grid.Row="0" Grid.ColumnSpan="2"></Label>
+    <Button Grid.Row="1" Text="Invoke1" Clicked="Invoke1_OnClick" Grid.ColumnSpan="2" />
+    <Button Grid.Row="2" Text="Invoke2" Clicked="Invoke2_OnClick" Grid.ColumnSpan="2"/>
+    <Button Grid.Row="3" Text="Get A" Clicked="Get_Click" Grid.ColumnSpan="2" />
+
+    <ListView x:Name="entities" Grid.Row="4" HeightRequest="50" Grid.ColumnSpan="2">
+      <ListView.ItemTemplate>
+        <DataTemplate>
+          <ViewCell>
+            <ViewCell.View>
+              <StackLayout>
+                <Label Text="{Binding Id}" />
+                <Label Text="{Binding Text}" />
+              </StackLayout>
+            </ViewCell.View>
+          </ViewCell>
+        </DataTemplate>
+      </ListView.ItemTemplate>
+    </ListView>
+
+    <Button Grid.Row="5" Text="Gat A by Id async" Clicked="Async1_OnClick" />
+    <Label x:Name="async1Res"  Grid.Row="5" Grid.Column="1" Text="sd" />
+    <Button Grid.Row="6" Text="Get As async" Clicked="Async2_OnClick" />
+    <Label x:Name="async2Res"  Grid.Row="6" Grid.Column="1" Text="sd" />
+
+    <ListView x:Name="_items" Grid.Row="7">
+      <ListView.ItemTemplate>
+        <DataTemplate>
+          <ViewCell>
+            <ViewCell.View>
+              <Grid BackgroundColor="Blue">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="100"/>
+                  <ColumnDefinition Width="100"/>
+                  <ColumnDefinition Width="100"/>
+                  <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+                <Label Text="Id" />
+                <Editor Text="{Binding Id}" Grid.Column="1"/>
+                <Label Text="Text" Grid.Column="2"/>
+                <Editor Text="{Binding Path=Text, Mode=TwoWay}" Grid.Column="3"/>
+              </Grid>
+            </ViewCell.View>
+          </ViewCell>
+        </DataTemplate>
+      </ListView.ItemTemplate>
+    </ListView>
+
+    <Button Grid.Row="8" Text="Submit" Clicked="Submit_Click"/>
+    <Label x:Name="submitRes" Grid.Row="8" Grid.Column="1" />
+
+    <Button Grid.Row="9" Text="Get Normal Exception" Clicked="NormalException_OnClick" />
+    <Label x:Name="_normalExceptionRes"  Grid.Row="9" Grid.Column="1" Text="sd" />
+
+    <Button Grid.Row="10" Text="Get Not Authorized Exception" Clicked="NotAuthorized_OnClick" />
+    <Label x:Name="_notAuthorizedRes"  Grid.Row="10" Grid.Column="1" Text="sd" />
+
+    <Button Grid.Row="11" Text="Get Domain Exception" Clicked="DomainException_OnClick" />
+    <Label x:Name="_domainExceptionRes"  Grid.Row="11" Grid.Column="1" Text="sd" />
+
+    <Button Grid.Row="12" Text="Invoke with complex parameter" Clicked="InvokeComplex_OnClick" />
+    <StackLayout Grid.Row="12" Grid.Column="1" Orientation="Horizontal">
+      <Label x:Name="_invokeComplexRes1"  Text="sd" />
+      <Label x:Name="_invokeComplexRes2" Text="sd" />
+    </StackLayout>
+
+    <Button Grid.Row="13" Text="Login" Clicked="Login_OnClick" />
+    <StackLayout Grid.Row="13" Grid.Column="1" Orientation="Horizontal">
+      <Editor x:Name="_loginName" Text="kalle" />
+      <Editor x:Name="_loginPassword"  Text="password" />
+    </StackLayout>
+
+    <Button Grid.Row="14" Text="Logout" Clicked="Logout_OnClick" />
+    <Editor x:Name="_userName" Grid.Row="14" Grid.Column="1"  />
+  </Grid>
+
+</ContentPage>
