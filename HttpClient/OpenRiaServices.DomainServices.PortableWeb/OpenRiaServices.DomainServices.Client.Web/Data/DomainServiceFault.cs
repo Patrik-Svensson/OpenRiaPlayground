@@ -13,6 +13,7 @@ namespace OpenRiaServices.DomainServices.Hosting
 namespace OpenRiaServices.DomainServices.Client
 #endif
 {
+    #if PORTABLE || NETSTANDARD
     /// <summary>
     /// Message type used to communicate exception results between server and client.
     /// </summary>
@@ -102,4 +103,5 @@ namespace OpenRiaServices.DomainServices.Client
             return this.OperationErrors.Select(oe => new ValidationResult(oe.Message, oe.SourceMemberNames)).ToList();
         }
     }
+    #endif
 }

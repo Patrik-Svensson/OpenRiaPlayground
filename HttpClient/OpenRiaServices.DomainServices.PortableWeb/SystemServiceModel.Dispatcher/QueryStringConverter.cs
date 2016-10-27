@@ -26,10 +26,8 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 using System;
-using System.ComponentModel;
 using System.Globalization;
-using System.ServiceModel;
-using System.ServiceModel.Description;
+using OpenRiaServices.DomainServices;
 
 namespace System.ServiceModel.Dispatcher
 {
@@ -42,7 +40,12 @@ namespace System.ServiceModel.Dispatcher
 		// http://msdn2.microsoft.com/en-us/library/bb412172.aspx
         public static bool CanConvert(Type type)
 		{
-			switch (Type.GetTypeCode (type)) {
+#if PORTABLE 
+            switch (Type.GetTypeCode (type))
+#else
+            switch (Convert.GetTypeCode(type))
+#endif
+            {
 			case TypeCode.Empty:
             case (TypeCode)2: // DBNull
 				return false;
@@ -67,7 +70,7 @@ namespace System.ServiceModel.Dispatcher
 		{
 			if (parameterType == null)
 				throw new ArgumentNullException ("parameterType");
-			if (parameterType.IsValueType && parameter == null)
+			if (parameterType.GetTypeInfo().IsValueType && parameter == null)
 				throw new ArgumentNullException ("parameter");
 
 			if (parameter == null)

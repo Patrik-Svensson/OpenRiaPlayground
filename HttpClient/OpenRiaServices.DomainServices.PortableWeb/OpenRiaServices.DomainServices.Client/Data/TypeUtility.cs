@@ -13,7 +13,6 @@ using System.Runtime.Serialization;
 
 #if SERVERFX
 using OpenRiaServices.DomainServices.Server;
-
 #else
 using OpenRiaServices.DomainServices.Client;
 #endif
@@ -23,7 +22,6 @@ namespace OpenRiaServices.DomainServices
     internal static class TypeUtility
     {
         internal const string OpenRiaServicesPublicKeyToken = "2e0b7ccb1ae5b4c8";
-        internal static readonly byte[] OpenRiaServicesPublicKeyTokenBytes = PublicKeyTokenToBytes(OpenRiaServicesPublicKeyToken);
 
         /// <summary>
         /// List of public key tokens used for System assemblies
@@ -41,7 +39,8 @@ namespace OpenRiaServices.DomainServices
         /// The list of assemblies that form OpenRiaServices. If OpenRiaServices is extended with
         /// additional assemblies, or if assemblies are removed, this array must be updated accordingly.
         /// </summary>
-        private static readonly string[] OpenRiaServicesAssemblyNames =
+        private static readonly HashSet<string> OpenRiaServicesAssemblyNames =
+        new HashSet<string>(StringComparer.Ordinal)
         {
             "OpenRiaServices.DomainServices.Client",
             "OpenRiaServices.DomainServices.Client.Web",
@@ -58,23 +57,10 @@ namespace OpenRiaServices.DomainServices
             "OpenRiaServices.DomainServices.Tools.TextTemplate"
         };
 
-        private static byte[] PublicKeyTokenToBytes(string publicKeyToken)
-        {
-            if(publicKeyToken == null || publicKeyToken.Length != 16)
-                return new byte[0];
-            else
-            {
-                var bytes = new byte[8];
-                for (int i = 0; i < bytes.Length; ++i)
-                    bytes[i] = Convert.ToByte(publicKeyToken.Substring(2 * i, 2), fromBase: 16);
-                return bytes;
-            }
-        }
-
 #if !WIZARD
         // list of "simple" types we will always accept for
         // serialization, inclusion from entities, etc.
-        // Primitive types are not here -- test for them via Type.IsPrimitive
+        // Primitive types are not here -- test for them via ReflectionUtility.IsPrimitive(type)
         private static HashSet<Type> predefinedTypes = new HashSet<Type>
         {
             typeof(string),
@@ -86,113 +72,147 @@ namespace OpenRiaServices.DomainServices
             typeof(Uri)
         };
 
-        private static bool IsGenericType(Type type)
+#region FRAMEWORK_INDEPENDENT_REFLECTION
+#if REFLECTION_V2
+        public static IEnumerable<Attribute> GetCustomAttributes(this Type type, bool inherit)
         {
-#if NETFX_CORE
-            return type.GetTypeInfo().IsGenericType;
+            return type.GetTypeInfo().GetCustomAttributes(inherit);
+        }
+
+        public static IEnumerable<Attribute> GetCustomAttributes(this Type type, Type attributeType, bool inherit)
+        {
+            return type.GetTypeInfo().GetCustomAttributes(attributeType, inherit);
+        }
+#endif
+
+#if REFLECTION_V2
+        public static TypeInfo GetTypeInfo(this Type type)
+        {
+            return IntrospectionExtensions.GetTypeInfo(type);
+        }
 #else
-            return type.IsGenericType;
+        public static Type GetTypeInfo(this Type type)
+        {
+            return type;
+        }
+#endif
+
+        public static bool IsGenericType(Type type)
+        {
+            return GetTypeInfo(type).IsGenericType;
+        }
+
+        public static Type GetBaseType(Type type)
+        {
+            return GetTypeInfo(type).BaseType;
+        }
+
+        public static bool IsEnum(Type type)
+        {
+            return GetTypeInfo(type).IsEnum;
+        }
+
+        public static bool IsInterface(Type type)
+        {
+            return GetTypeInfo(type).IsInterface;
+        }
+
+        public static bool IsPrimitive(Type type)
+        {
+            return GetTypeInfo(type).IsPrimitive;
+        }
+
+        public static bool IsAbstract(Type type)
+        {
+            return GetTypeInfo(type).IsAbstract;
+        }
+
+        public static bool IsValueType(Type type)
+        {
+            return GetTypeInfo(type).IsValueType;
+        }
+
+        public static Assembly GetAssembly(Type type)
+        {
+            return GetTypeInfo(type).Assembly;
+        }
+
+        public static bool IsAssignableFrom(this Type type, Type c)
+        {
+            return GetTypeInfo(type).IsAssignableFrom(GetTypeInfo(c));
+        }
+
+        /// <summary>
+        /// Determines if a specific attribute is defined on a property.
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="attributeType">the type of attribute to look for</param>
+        /// <param name="inherit"></param>
+        /// <returns><c>true</c> if the attribute is defined, otherwise <c>false</c></returns>
+        public static bool IsAttributeDefined(PropertyInfo property, Type attributeType, bool inherit)
+        {
+#if REFLECTION_V2
+            return property.GetCustomAttributes(attributeType, inherit).Any();
+#else
+            return property.IsDefined(attributeType, inherit);
 #endif
         }
 
-        private static Type GetBaseType(Type type)
+        /// <summary>
+        /// Determines if a specific attribute is defined for a type.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="attributeType">the type of attribute to look for</param>
+        /// <param name="inherit"></param>
+        /// <returns><c>true</c> if the attribute is defined, otherwise <c>false</c></returns>
+        public static bool IsAttributeDefined(Type type, Type attributeType, bool inherit)
         {
-#if NETFX_CORE
-            return type.GetTypeInfo().BaseType;
+#if REFLECTION_V2
+            return type.GetCustomAttributes(attributeType, inherit).Any();
 #else
-            return type.BaseType;
+            return type.IsDefined(attributeType, inherit);
+#endif
+        }
+    
+        #endregion
+
+        public static bool GetSingleAttributeOrNull(PropertyInfo property, Type attributeType, bool inherit)
+        {
+            var properties = property.GetCustomAttributes(attributeType, inherit);
+
+#if REFLECTION_V2
+            using (var enumerator = properties.GetEnumerator())
+            {
+                // Check for first item
+                if (!enumerator.MoveNext())
+                    return false;
+                var attribute = enumerator.Current;
+
+                // Check for second item
+                if (enumerator.MoveNext())
+                    return false;
+                else
+                    return true;
+            }
+#else
+            return properties.Length == 1;
 #endif
         }
 
-        private static bool IsEnum(Type type)
-        {
-#if NETFX_CORE
-            return type.GetTypeInfo().IsEnum;
-#else
-            return type.IsEnum;
-#endif
-        }
-
-        private static bool IsInterface(Type type)
-        {
-#if NETFX_CORE
-            return type.GetTypeInfo().IsInterface;
-#else
-            return type.IsInterface;
-#endif
-        }
-
-        private static bool IsPrimitive(Type type)
-        {
-#if NETFX_CORE
-            return type.GetTypeInfo().IsPrimitive;
-#else
-            return type.IsPrimitive;
-#endif
-        }
-
+#if PORTABLE
         private static Type[] s_emptyTypes = new Type[0];
-        internal static Type[] EmptyTypes
+        public static Type[] EmptyTypes
         {
             get 
             {
                 return s_emptyTypes;
             }
         }
-
-#if NETFX_CORE
-
-        internal static MethodInfo GetMethod(this Type type, string name)
-        {
-            var typeInfo = type.GetTypeInfo();
-            var result = typeInfo.GetDeclaredMethod(name);
-
-            if (result != null || typeInfo.BaseType == null)
-                return result;
-            else
-                return GetMethod(typeInfo.BaseType, name);
-        }
-
-        internal static ConstructorInfo GetConstructor(this Type type, Type[] parameterTypes)
-        {
-            foreach (var ctor in type.GetTypeInfo().DeclaredConstructors)
-            {
-                var parameters = ctor.GetParameters();
-                if (parameterTypes.Length != parameters.Length)
-                    continue;
-
-                bool typeMatch = true;
-                for (int i=0; i < parameterTypes.Length && typeMatch; ++i)
-                {
-                    typeMatch = parameters[i].ParameterType == parameterTypes[parameters[i].Position];
-                }
-
-                if (typeMatch)
-                    return ctor;
-            }
-
-            return null;
-        }
-
-        internal static Type[] GetGenericArguments(this Type type)
-        {
-            return type.GenericTypeArguments;
-        }
-
-        internal static IEnumerable<Type> GetInterfaces(this Type type)
-        {
-            return type.GetTypeInfo().ImplementedInterfaces;
-        }
-
-        internal static bool IsAssignableFrom(this Type type, Type c)
-        {
-            if (c == null)
-                throw new ArgumentNullException("c");
-
-            return type.GetTypeInfo().IsAssignableFrom(c.GetTypeInfo());
-        }
-
+#else
+        public static Type[] EmptyTypes { get { return Type.EmptyTypes; } }
 #endif
+
+
         /// <summary>
         /// Returns <c>true</c> if the given type is a <see cref="Nullable"/>
         /// </summary>
@@ -337,7 +357,7 @@ namespace OpenRiaServices.DomainServices
 
             // We test XElement by Type Name so our client framework assembly can avoid
             // taking an assembly reference to System.Xml.Linq
-            if (string.Compare(type.FullName, "System.Xml.Linq.XElement", StringComparison.Ordinal) == 0)
+            if (string.Equals(type.FullName, "System.Xml.Linq.XElement", StringComparison.Ordinal))
             {
                 return true;
             }
@@ -360,7 +380,7 @@ namespace OpenRiaServices.DomainServices
                 return false;
             }
 #else
-            if (!type.IsVisible || IsGenericType(type) || type.IsAbstract)
+            if (!type.IsVisible || TypeUtility.IsGenericType(type) || IsAbstract(type))
             {
                 return false;
             }
@@ -436,7 +456,7 @@ namespace OpenRiaServices.DomainServices
         /// or <see cref="Nullable"/>, this method returns the element
         /// type of the generic parameter
         /// </remarks>
-        /// <param name="type"><see cref="Type"/> to examine.</param>
+        /// <param name="type"><see cref="T:System.Type"/> to examine.</param>
         /// <returns>The underlying element type starting from the given type</returns>
         public static Type GetElementType(Type type)
         {
@@ -506,7 +526,7 @@ namespace OpenRiaServices.DomainServices
                     bool interfaceMatched = false;
                     foreach (Type interfaceType in genericType.GetInterfaces().Concat(new[] { derivedType }))
                     {
-                        if (IsGenericType(interfaceType) &&
+                        if (IsGenericType(interfaceType)  &&
                             genericTypeDefinition == interfaceType.GetGenericTypeDefinition())
                         {
                             interfaceMatched = true;
@@ -554,8 +574,8 @@ namespace OpenRiaServices.DomainServices
                     }
                 }
             }
-            var ifaces = seqType.GetInterfaces();
-            if (ifaces != null)
+            Type[] ifaces = seqType.GetInterfaces();
+            if (ifaces != null && ifaces.Length > 0)
             {
                 foreach (Type iface in ifaces)
                 {
@@ -566,21 +586,20 @@ namespace OpenRiaServices.DomainServices
                     }
                 }
             }
-
-            var baseType = GetBaseType(seqType);
-            if (baseType != null && baseType != typeof(object))
+            if (GetBaseType(seqType) != null && GetBaseType(seqType) != typeof(object))
             {
-                return FindIEnumerable(baseType);
+                return FindIEnumerable(GetBaseType(seqType));
             }
             return null;
         }
 #endif
-        /// <summary>
-        /// Performs a check against an assembly to determine if it's a known
-        /// System assembly.
-        /// </summary>
-        /// <param name="assembly">The assembly to check.</param>
-        /// <returns><c>true</c> if the assembly is known to be a system assembly, otherwise <c>false</c>.</returns>
+
+            /// <summary>
+            /// Performs a check against an assembly to determine if it's a known
+            /// System assembly.
+            /// </summary>
+            /// <param name="assembly">The assembly to check.</param>
+            /// <returns><c>true</c> if the assembly is known to be a system assembly, otherwise <c>false</c>.</returns>
         internal static bool IsSystemAssembly(this Assembly assembly)
         {
             return IsSystemAssembly(assembly.FullName);
@@ -613,12 +632,11 @@ namespace OpenRiaServices.DomainServices
 
             // parse the public key token
             int idx = assemblyName.FullName.IndexOf("PublicKeyToken=", StringComparison.OrdinalIgnoreCase);
-            if (idx == 0)
+            if (idx == -1)
             {
                 return false;
             }
-            string publicKeyToken = assemblyName.FullName.Substring(idx + 15);
-            return OpenRiaServicesPublicKeyToken == publicKeyToken;
+            return string.CompareOrdinal(OpenRiaServicesPublicKeyToken, 0, assemblyName.FullName, idx + 15, OpenRiaServicesPublicKeyToken.Length) == 0;
         }
 
         /// <summary>
@@ -646,29 +664,30 @@ namespace OpenRiaServices.DomainServices
         /// <returns><c>true</c> if the assembly is known to be a system assembly, otherwise <c>false</c>.</returns>
         internal static bool IsSystemAssembly(string assemblyFullName)
         {
-            // Return true if it is a Open Ria Services assembly
-            var assemblyName = new AssemblyName(assemblyFullName);
-            if (OpenRiaServicesAssemblyNames.Contains(assemblyName.Name))
-            {
-                return true;
-            }
-
             // parse the public key token
             int idx = assemblyFullName.IndexOf("PublicKeyToken=", StringComparison.OrdinalIgnoreCase);
-            if (idx == 0)
-            {
-                return false;
-            }
+            int publicKeyIndex = idx + 15;
 
-            try
+            // If the assembly has a public key, then it must be once of the system public keys or it 
+            // is not a system assembly. 
+            if (idx != -1)
             {
-               string publicKeyToken = assemblyFullName.Substring(idx + 15, 16);
-               return systemAssemblyPublicKeyTokens.Any(p => p.Equals(publicKeyToken, StringComparison.OrdinalIgnoreCase));
+                // Se if it matches any of the system keys
+                foreach (var systemKey in systemAssemblyPublicKeyTokens)
+                {
+                    if (string.CompareOrdinal(systemKey, 0, assemblyFullName, publicKeyIndex, systemKey.Length) == 0)
+                        return true;
+                }
+
+                // OpenRiaServices assemblies can have null as key (in which case we treat it as no key and compare by name)
+                // any other key indicates that this is not a system assembly, since if they have a key it should be the system key
+                if (string.CompareOrdinal("null", 0, assemblyFullName, publicKeyIndex, 4) != 0)
+                    return false;
             }
-            catch (ArgumentOutOfRangeException)
-            {
-               return false;
-            }
+            
+            // Return true if it is a Open Ria Services assembly
+            var assemblyName = new AssemblyName(assemblyFullName);
+            return OpenRiaServicesAssemblyNames.Contains(assemblyName.Name);
         }
     }
 }

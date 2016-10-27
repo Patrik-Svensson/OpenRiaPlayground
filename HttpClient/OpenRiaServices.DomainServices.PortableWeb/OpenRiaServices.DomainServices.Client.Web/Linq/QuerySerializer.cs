@@ -461,10 +461,10 @@ namespace OpenRiaServices.DomainServices.Client
 
                     if ((member.DeclaringType == typeof(DateTime) || member.DeclaringType == typeof(DateTimeOffset)) &&
                         mex.Expression == null &&
-#if SILVERLIGHT || SERVERFX
+#if SILVERLIGHT || SERVERFX || (NETSTANDARD && !NETSTANDARD1_3)
                         member.MemberType == System.Reflection.MemberTypes.Property
 #else
-                        member.ReflectedType.GetProperty(member.Name) != null
+                        member.DeclaringType.GetProperty(member.Name) != null
 #endif
                         )
                     {
@@ -535,7 +535,7 @@ namespace OpenRiaServices.DomainServices.Client
                     // Wrap quotes and backslashes.
                     value = "'" + Convert.ToString(c, CultureInfo.InvariantCulture).Replace("\\", "\\\\").Replace("'", "\\'") + "'";
                 }
-                else if (valueType.IsEnum)
+                else if (valueType.GetTypeInfo().IsEnum)
                 {
                     // SL doesn't support Enum.Format
                     value = string.Format(CultureInfo.InvariantCulture, "{0}.{1}", valueType.Name, c);

@@ -56,6 +56,7 @@
     <Compile Include="OpenRiaServices.DomainServices.Client.Web\Linq\QuerySerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="app.config" />
+    <None Include="OpenRiaServices.DomainServices.PortableWeb.project.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -66,6 +67,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <!--
     <Reference Include="OpenRiaServices.DomainServices.Client, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenRiaServices.Client.Core.4.5.0-rc1\lib\portable-net45+sl5+win8\OpenRiaServices.DomainServices.Client.dll</HintPath>
       <Private>True</Private>
@@ -94,6 +96,7 @@
       <HintPath>..\packages\Microsoft.Bcl.1.1.10\lib\portable-net40+sl5+win8+wp8+wpa81\System.Threading.Tasks.dll</HintPath>
       <Private>True</Private>
     </Reference>
+	-->
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.14\tools\Microsoft.Bcl.Build.targets')" />
