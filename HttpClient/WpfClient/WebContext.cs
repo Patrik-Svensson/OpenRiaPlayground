@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace WpfWithPortable
+namespace HttpClientExampleClient
 {
     using System;
     using System.Collections.Generic;

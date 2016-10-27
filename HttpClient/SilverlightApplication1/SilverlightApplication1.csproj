@@ -9,7 +9,7 @@
     <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SilverlightApplication1</RootNamespace>
+    <RootNamespace>HttpClientExampleClient</RootNamespace>
     <AssemblyName>SilverlightApplication1</AssemblyName>
     <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
@@ -78,15 +78,15 @@
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="OpenRiaServices.Data.DomainServices, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenRiaServices.ViewModel.4.5.0-rc1\lib\sl50\OpenRiaServices.Data.DomainServices.dll</HintPath>
+      <HintPath>..\packages\OpenRiaServices.ViewModel.4.5.0-rc2\lib\sl50\OpenRiaServices.Data.DomainServices.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="OpenRiaServices.DomainServices.Client, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenRiaServices.Client.Core.4.5.0-rc1\lib\sl50\OpenRiaServices.DomainServices.Client.dll</HintPath>
+      <HintPath>..\packages\OpenRiaServices.Client.Core.4.5.0-rc2\lib\sl50\OpenRiaServices.DomainServices.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="OpenRiaServices.DomainServices.Client.Web, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenRiaServices.Client.Core.4.5.0-rc1\lib\sl50\OpenRiaServices.DomainServices.Client.Web.dll</HintPath>
+      <HintPath>..\packages\OpenRiaServices.Client.Core.4.5.0-rc2\lib\sl50\OpenRiaServices.DomainServices.Client.Web.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations, Version=5.0.5.0, Culture=neutral, PublicKeyToken=ddd0da4d3e678217, processorArchitecture=MSIL" />
@@ -148,14 +148,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\AppManifest.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OpenRiaServices.DomainServices.PortableWeb\OpenRiaServices.DomainServices.PortableWeb.csproj">
       <Project>{eff65711-af05-4939-86d6-2bbbfb24dc04}</Project>
       <Name>OpenRiaServices.DomainServices.PortableWeb</Name>
-      <Aliases>HttpClient</Aliases>
+      <Aliases>global</Aliases>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
@@ -179,7 +181,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
-    <Error Condition="!Exists('..\packages\OpenRiaServices.Client.CodeGen.4.5.0-rc1\build\OpenRiaServices.Client.CodeGen.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenRiaServices.Client.CodeGen.4.5.0-rc1\build\OpenRiaServices.Client.CodeGen.targets'))" />
+    <Error Condition="!Exists('..\packages\OpenRiaServices.Silverlight.CodeGen.4.5.0-rc2\build\OpenRiaServices.Silverlight.CodeGen.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenRiaServices.Silverlight.CodeGen.4.5.0-rc2\build\OpenRiaServices.Silverlight.CodeGen.targets'))" />
   </Target>
-  <Import Project="..\packages\OpenRiaServices.Client.CodeGen.4.5.0-rc1\build\OpenRiaServices.Client.CodeGen.targets" Condition="Exists('..\packages\OpenRiaServices.Client.CodeGen.4.5.0-rc1\build\OpenRiaServices.Client.CodeGen.targets')" />
+  <Import Project="..\packages\OpenRiaServices.Silverlight.CodeGen.4.5.0-rc2\build\OpenRiaServices.Silverlight.CodeGen.targets" Condition="Exists('..\packages\OpenRiaServices.Silverlight.CodeGen.4.5.0-rc2\build\OpenRiaServices.Silverlight.CodeGen.targets')" />
 </Project>

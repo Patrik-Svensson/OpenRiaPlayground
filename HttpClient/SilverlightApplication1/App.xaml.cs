@@ -1,5 +1,4 @@
-﻿extern alias HttpClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -14,7 +13,7 @@ using OpenRiaServices.DomainServices.Client;
 using OpenRiaServices.DomainServices.Client.ApplicationServices;
 
 
-namespace SilverlightApplication1
+namespace HttpClientExampleClient
 {
     public partial class App : Application
     {

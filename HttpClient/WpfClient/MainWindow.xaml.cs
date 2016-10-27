@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,16 +17,24 @@ using OpenRiaServices.DomainServices.Client;
 using OpenRiaServices.DomainServices.Client.ApplicationServices;
 using TestDomainServices;
 
-namespace WpfWithPortable
+namespace HttpClientExampleClient
 {
     public partial class MainWindow : Window
     {
-        readonly ServerSideAsyncDomainContext _ctx = new ServerSideAsyncDomainContext();
+        ServerSideAsyncDomainContext _ctx = new ServerSideAsyncDomainContext();
+        private CookieContainer _cookieContainer = new CookieContainer();
 
         public MainWindow()
         {
             InitializeComponent();
 
+            this.entities.ItemsSource = _ctx.RangeItems;
+            this._items.ItemsSource = _ctx.RangeItems;
+        }
+
+        private void SetupNewDomainContext()
+        {
+            _ctx = new ServerSideAsyncDomainContext();
             this.entities.ItemsSource = _ctx.RangeItems;
             this._items.ItemsSource = _ctx.RangeItems;
         }
@@ -232,11 +241,36 @@ namespace WpfWithPortable
 
         private void OpenRiaWeb_Click(object sender, RoutedEventArgs e)
         {
-
+            DomainContext.DomainClientFactory = new OpenRiaServices.DomainServices.Client.Web.SoapDomainClientFactory()
+            {
+                ServerBaseUri = GetServerBaseUri(),
+                CookieContainer = _cookieContainer,
+            };
+            SetupNewDomainContext();
         }
 
         private void OpenRiaPortableWeb_Click(object sender, RoutedEventArgs e)
         {
+            DomainContext.DomainClientFactory = new OpenRiaServices.DomainServices.Client.PortableWeb.WebApiDomainClientFactory()
+            {
+                ServerBaseUri = GetServerBaseUri(),
+                HttpClientHandler = new System.Net.Http.HttpClientHandler()
+                {
+                    CookieContainer = _cookieContainer,
+                    UseCookies = true,
+                    AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip
+                }
+            };
+            SetupNewDomainContext();
+        }
+
+        private static Uri GetServerBaseUri()
+        {
+#if SILVERLIGHT
+            return Application.Current.Host.Source;
+#else
+            return new Uri("http://localhost:51359/ClientBin/", UriKind.Absolute);
+#endif
         }
     }
 }

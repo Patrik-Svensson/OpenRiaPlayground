@@ -1,4 +1,4 @@
-﻿<Window x:Class="WpfWithPortable.MainWindow"
+﻿<Window x:Class="HttpClientExampleClient.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="350" Width="525">
@@ -97,8 +97,8 @@
         <Button Grid.Row="14" Content="Logout" Click="Logout_OnClick" />
         <TextBox x:Name="_userName" Grid.Row="14" Grid.Column="1"  />
 
-        <RadioButton x:Name="OpenRiaWeb" Content="OpenRia.Web" Grid.Row="15" Grid.Column="1" GroupName="DomainClientFactory" Click="OpenRiaWeb_Click" />
-        <RadioButton x:Name="OpenRiaHttpClient" Content="OpenRia.PortableWeb" Grid.Row="15" Grid.Column="2" GroupName="DomainClientFactory" Click="OpenRiaPortableWeb_Click"/>
+        <RadioButton x:Name="OpenRiaWeb" Content="OpenRia.Web" Grid.Row="15" Grid.Column="0" GroupName="DomainClientFactory" Click="OpenRiaWeb_Click" />
+        <RadioButton x:Name="OpenRiaHttpClient" Content="OpenRia.PortableWeb" Grid.Row="15" Grid.Column="1" GroupName="DomainClientFactory" Click="OpenRiaPortableWeb_Click"/>
 
     </Grid>
 </Window>

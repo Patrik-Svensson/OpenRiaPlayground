@@ -44,11 +44,15 @@
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="OpenRiaServices.DomainServices.Hosting, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenRiaServices.Server.4.5.0-rc1\lib\OpenRiaServices.DomainServices.Hosting.dll</HintPath>
+      <HintPath>..\packages\OpenRiaServices.Server.4.5.0-rc2\lib\net45\OpenRiaServices.DomainServices.Hosting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="OpenRiaServices.DomainServices.Hosting.Endpoint, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenRiaServices.Endpoints.4.5.0-rc2\lib\net45\OpenRiaServices.DomainServices.Hosting.Endpoint.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="OpenRiaServices.DomainServices.Server, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenRiaServices.Server.4.5.0-rc1\lib\OpenRiaServices.DomainServices.Server.dll</HintPath>
+      <HintPath>..\packages\OpenRiaServices.Server.4.5.0-rc2\lib\net45\OpenRiaServices.DomainServices.Server.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
@@ -86,7 +90,9 @@
     <Compile Include="ServerSideAsyncDomainService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages.config" />
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -138,12 +144,12 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-  <Import Project="..\packages\OpenRiaServices.Server.4.5.0-rc1\build\OpenRiaServices.Server.targets" Condition="Exists('..\packages\OpenRiaServices.Server.4.5.0-rc1\build\OpenRiaServices.Server.targets')" />
+  <Import Project="..\packages\OpenRiaServices.Server.4.5.0-rc2\build\OpenRiaServices.Server.targets" Condition="Exists('..\packages\OpenRiaServices.Server.4.5.0-rc2\build\OpenRiaServices.Server.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\OpenRiaServices.Server.4.5.0-rc1\build\OpenRiaServices.Server.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenRiaServices.Server.4.5.0-rc1\build\OpenRiaServices.Server.targets'))" />
+    <Error Condition="!Exists('..\packages\OpenRiaServices.Server.4.5.0-rc2\build\OpenRiaServices.Server.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenRiaServices.Server.4.5.0-rc2\build\OpenRiaServices.Server.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

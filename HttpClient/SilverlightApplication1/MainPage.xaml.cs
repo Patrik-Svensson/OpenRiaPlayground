@@ -1,6 +1,4 @@
-﻿extern alias HttpClient;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -15,43 +13,30 @@ using OpenRiaServices.DomainServices.Client;
 using OpenRiaServices.DomainServices.Client.ApplicationServices;
 using TestDomainServices;
 
-
-namespace SilverlightApplication1
+namespace HttpClientExampleClient
 {
     public partial class MainPage : UserControl
     {
-        /*
-        public class TestDomainContext : SilverlightApplication1.Web.TestDomainContext
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="TestDomainContext"/> class.
-            /// </summary>
-            public TestDomainContext() : 
-                    this(new Uri("SilverlightApplication1-Web-TestDomainService.svc", UriKind.Relative))
-            {
-            }
-        
-            /// <summary>
-            /// Initializes a new instance of the <see cref="TestDomainContext"/> class with the specified service URI.
-            /// </summary>
-            /// <param name="serviceUri">The TestDomainService service URI.</param>
-            public TestDomainContext(Uri serviceUri) : 
-                    base(new WebDomainClient<ITestDomainServiceContract>(serviceUri))
-            {
-            }
-        }
-        TestDomainContext ctx = new TestDomainContext();
-        */
-
-
-        readonly ServerSideAsyncDomainContext _ctx = new ServerSideAsyncDomainContext();
+        private ServerSideAsyncDomainContext _ctx;
+        private CookieContainer _cookieContainer = new CookieContainer();
 
         public MainPage()
         {
             InitializeComponent();
 
+            SetupNewDomainContext();
+        }
+
+        private void SetupNewDomainContext()
+        {
+            _ctx = new ServerSideAsyncDomainContext();
             this.entities.ItemsSource = _ctx.RangeItems;
             this._items.ItemsSource = _ctx.RangeItems;
+
+            var client = _ctx.DomainClient as WebDomainClient<ServerSideAsyncDomainContext.IServerSideAsyncDomainServiceContract>;
+            var uri1 = client.ServiceUri;
+            _ctx.GetLastDelayAsync();
+            var uri2 = client.ServiceUri;
         }
 
         public string Status1
@@ -258,16 +243,34 @@ namespace SilverlightApplication1
         {
             DomainContext.DomainClientFactory = new OpenRiaServices.DomainServices.Client.Web.WebDomainClientFactory()
             {
-
+                ServerBaseUri = GetServerBaseUri(),
+                CookieContainer = _cookieContainer,
             };
+            SetupNewDomainContext();
         }
 
         private void OpenRiaPortableWeb_Click(object sender, RoutedEventArgs e)
         {
-            DomainContext.DomainClientFactory = new HttpClient::OpenRiaServices.DomainServices.Client.PortableWeb.WebApiDomainClientFactory()
+            DomainContext.DomainClientFactory = new OpenRiaServices.DomainServices.Client.PortableWeb.WebApiDomainClientFactory()
             {
-                ServerBaseUri = Application.Current.Host.Source
+                ServerBaseUri = GetServerBaseUri(),
+                HttpClientHandler = new System.Net.Http.HttpClientHandler()
+                {
+                    CookieContainer = _cookieContainer,
+                    UseCookies = true,
+                    AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip
+                }
             };
+            SetupNewDomainContext();
+        }
+
+        private static Uri GetServerBaseUri()
+        {
+#if SILVERLIGHT
+            return Application.Current.Host.Source;
+#else
+            return new Uri("http://localhost:51359/ClientBin/", UriKind.Absolute);
+#endif
         }
     }
 }

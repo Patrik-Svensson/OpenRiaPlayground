@@ -1,5 +1,4 @@
-﻿extern alias HttpClient;
-
+﻿
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -7,9 +6,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
-using HttpClient::OpenRiaServices.DomainServices.Client.PortableWeb;
 using OpenRiaServices.DomainServices.Client;
 using OpenRiaServices.DomainServices.Client.ApplicationServices;
+using OpenRiaServices.DomainServices.Client.PortableWeb;
 
 namespace WpfWithPortable
 {
