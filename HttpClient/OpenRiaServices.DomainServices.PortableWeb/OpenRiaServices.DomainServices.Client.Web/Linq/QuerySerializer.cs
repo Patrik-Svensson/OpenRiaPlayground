@@ -15,7 +15,7 @@ namespace OpenRiaServices.DomainServices.Client
     /// <summary>
     /// This serializer supports Where, OrderBy, Skip and Take.
     /// </summary>
-    internal static class QuerySerializer
+    public static class QuerySerializer
     {
         public static List<ServiceQueryPart> Serialize(IQueryable query)
         {
