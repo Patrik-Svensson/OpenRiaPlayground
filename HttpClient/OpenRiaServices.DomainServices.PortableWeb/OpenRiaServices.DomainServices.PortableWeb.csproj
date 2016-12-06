@@ -31,7 +31,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;PORTABLE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -69,7 +69,7 @@
   <ItemGroup>
     <!--
     <Reference Include="OpenRiaServices.DomainServices.Client, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenRiaServices.Client.Core.4.5.0-rc1\lib\portable-net45+sl5+win8\OpenRiaServices.DomainServices.Client.dll</HintPath>
+      <HintPath>..\packages\OpenRiaServices.Client.Core.4.5.0-rc2\lib\portable-net45+sl5+win8\OpenRiaServices.DomainServices.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.IO, Version=1.5.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
