@@ -251,6 +251,7 @@ namespace HttpClientExampleClient
 
         private void OpenRiaPortableWeb_Click(object sender, RoutedEventArgs e)
         {
+            /*
             DomainContext.DomainClientFactory = new OpenRiaServices.DomainServices.Client.PortableWeb.WebApiDomainClientFactory()
             {
                 ServerBaseUri = GetServerBaseUri(),
@@ -260,7 +261,7 @@ namespace HttpClientExampleClient
                     UseCookies = true,
                     AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip
                 }
-            };
+            };*/
             SetupNewDomainContext();
         }
 
