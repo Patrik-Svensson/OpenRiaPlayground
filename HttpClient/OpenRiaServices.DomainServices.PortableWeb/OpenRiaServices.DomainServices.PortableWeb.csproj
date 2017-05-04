@@ -4,6 +4,7 @@
     <TargetFrameworks>netstandard1.3;net45;portable-net45+sl5+win8</TargetFrameworks>
     <!--<TargetFrameworks>sl5</TargetFrameworks>-->
     <AssemblyName>OpenRiaServices.DomainServices.PortableWeb</AssemblyName>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'portable-net45+sl5+win8'">
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
@@ -21,8 +22,8 @@
     <LanguageTargets>C:\Program Files (x86)\MSBuild\Microsoft\Silverlight\v5.0\Microsoft.Silverlight.CSharp.targets</LanguageTargets>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="OpenRiaServices.Client.Core" Version="4.5.0-rc2" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
+    <PackageReference Include="OpenRiaServices.Client.Core" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.3.0" />
