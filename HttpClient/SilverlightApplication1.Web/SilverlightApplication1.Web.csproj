@@ -19,7 +19,8 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
-    <SilverlightApplicationList>{842F7A62-A0E3-4B18-837E-155CA167D513}|..\SilverlightApplication1\SilverlightApplication1.csproj|ClientBin|False</SilverlightApplicationList>
+    <SilverlightApplicationList>
+    </SilverlightApplicationList>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <UseGlobalApplicationHostFile />
@@ -44,16 +45,13 @@
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="OpenRiaServices.DomainServices.Hosting, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenRiaServices.Server.4.5.0-rc2\lib\net45\OpenRiaServices.DomainServices.Hosting.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\OpenRiaServices.Server.4.5.0\lib\net45\OpenRiaServices.DomainServices.Hosting.dll</HintPath>
     </Reference>
     <Reference Include="OpenRiaServices.DomainServices.Hosting.Endpoint, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenRiaServices.Endpoints.4.5.0-rc2\lib\net45\OpenRiaServices.DomainServices.Hosting.Endpoint.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\OpenRiaServices.Endpoints.4.5.0\lib\net45\OpenRiaServices.DomainServices.Hosting.Endpoint.dll</HintPath>
     </Reference>
     <Reference Include="OpenRiaServices.DomainServices.Server, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenRiaServices.Server.4.5.0-rc2\lib\net45\OpenRiaServices.DomainServices.Server.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\OpenRiaServices.Server.4.5.0\lib\net45\OpenRiaServices.DomainServices.Server.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Runtime.Serialization" />
@@ -75,7 +73,6 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ClientBin\SilverlightApplication1.xap" />
     <Content Include="Silverlight.js" />
     <Content Include="SilverlightApplication1TestPage.aspx" />
     <Content Include="SilverlightApplication1TestPage.html" />
@@ -90,9 +87,7 @@
     <Compile Include="ServerSideAsyncDomainService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages.config">
-      <SubType>Designer</SubType>
-    </Content>
+    <Content Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -100,7 +95,9 @@
       <DependentUpon>Web.config</DependentUpon>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="ClientBin\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
@@ -144,12 +141,12 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
-  <Import Project="..\packages\OpenRiaServices.Server.4.5.0-rc2\build\OpenRiaServices.Server.targets" Condition="Exists('..\packages\OpenRiaServices.Server.4.5.0-rc2\build\OpenRiaServices.Server.targets')" />
+  <Import Project="..\packages\OpenRiaServices.Server.4.5.0\build\OpenRiaServices.Server.targets" Condition="Exists('..\packages\OpenRiaServices.Server.4.5.0\build\OpenRiaServices.Server.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\OpenRiaServices.Server.4.5.0-rc2\build\OpenRiaServices.Server.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenRiaServices.Server.4.5.0-rc2\build\OpenRiaServices.Server.targets'))" />
+    <Error Condition="!Exists('..\packages\OpenRiaServices.Server.4.5.0\build\OpenRiaServices.Server.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenRiaServices.Server.4.5.0\build\OpenRiaServices.Server.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
