@@ -23,8 +23,18 @@ namespace HttpClientExampleClient
             this.Startup += App_Startup;
         }
 
+        public class Http2CustomHandler : WinHttpHandler
+        {
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
+            {
+                request.Version = new Version("2.0");
+                return base.SendAsync(request, cancellationToken);
+            }
+        }
+
         private void App_Startup(object sender, StartupEventArgs e)
         {
+            // Web client 
             DomainContext.DomainClientFactory = new WebApiDomainClientFactory()
             {
                 HttpClientHandler = new HttpClientHandler()
@@ -32,11 +42,22 @@ namespace HttpClientExampleClient
                     UseProxy = true,
                     AutomaticDecompression = System.Net.DecompressionMethods.Deflate | System.Net.DecompressionMethods.GZip
                 },
-                // Uncomment this to debug in fiddler
-                // ServerBaseUri = new Uri("http://localhost.fiddler:51359/ClientBin/", UriKind.Absolute)
                 ServerBaseUri = new Uri("http://localhost:51359/ClientBin/", UriKind.Absolute)
             };
 
+
+            // Enable HTTP/2 support
+            DomainContext.DomainClientFactory = new WebApiDomainClientFactory()
+            {
+                HttpClientHandler = new Http2CustomHandler()
+                {
+                    AutomaticDecompression = System.Net.DecompressionMethods.Deflate | System.Net.DecompressionMethods.GZip,
+                    WindowsProxyUsePolicy = WindowsProxyUsePolicy.UseWinInetProxy,
+                },
+                ServerBaseUri = new Uri("https://localhost:44300/ClientBin/", UriKind.Absolute)
+            };
+
+            /*
             DomainContext.DomainClientFactory = new OpenRiaServices.DomainServices.Client.Web.WebDomainClientFactory()
             {
                 // Uncomment this to debug in fiddler
@@ -51,7 +72,7 @@ namespace HttpClientExampleClient
                  ServerBaseUri = new Uri("http://localhost.fiddler:51359/ClientBin/", UriKind.Absolute)
                 //ServerBaseUri = new Uri("http://localhost:51359/ClientBin/", UriKind.Absolute)
             };
-
+            */
 
             // Create a WebContext and add it to the ApplicationLifetimeObjects collection.
             // This will then be available as WebContext.Current.

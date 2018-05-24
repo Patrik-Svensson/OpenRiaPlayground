@@ -21,7 +21,7 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
         Type _serviceInterface;
         HttpClient _httpClientCache;
 
-        public WebApiDomainClient(Type serviceInterface, Uri baseUri, HttpClientHandler handler)
+        public WebApiDomainClient(Type serviceInterface, Uri baseUri, HttpMessageHandler handler)
         {
             _serviceInterface = serviceInterface;
             _httpClientCache = new HttpClient(handler, disposeHandler: false)

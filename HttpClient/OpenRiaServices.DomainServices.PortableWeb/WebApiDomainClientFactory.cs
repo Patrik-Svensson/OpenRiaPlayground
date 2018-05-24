@@ -22,6 +22,6 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
             return new WebApiDomainClient(serviceContract, serviceUri, HttpClientHandler);
         }
 
-        public HttpClientHandler HttpClientHandler { get; set; }
+        public HttpMessageHandler HttpClientHandler { get; set; }
     }
 }
