@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace OpenRiaServices.DomainServices.Client.PortableWeb
 {
 
-    public class WebApiDomainClient : OpenRiaServices.DomainServices.Client.DomainClient
+    public partial class WebApiDomainClient : OpenRiaServices.DomainServices.Client.DomainClient
     {
         private static readonly Dictionary<Type, Dictionary<Type, DataContractSerializer>> s_globalSerializerCache = new Dictionary<Type, Dictionary<Type, DataContractSerializer>>();
         private static readonly DataContractSerializer s_faultSerializer = new DataContractSerializer(typeof(DomainServiceFault));
@@ -251,69 +251,10 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
         /// <returns></returns>
         private Task<HttpResponseMessage> PostAsync(WebApiDomainClientAsyncResult result, IDictionary<string, object> parameters, IList<ServiceQueryPart> queryOptions)
         {
-            var ms = new System.IO.MemoryStream();
-            var writer = System.Xml.XmlDictionaryWriter.CreateBinaryWriter(ms);
-
-            // Write message
-            {
-                var rootNamespace = "http://tempuri.org/";
-                bool hasQueryOptions = (queryOptions != null && queryOptions.Count > 0);
-
-                if (hasQueryOptions)
-                {
-                    writer.WriteStartElement("MessageRoot");
-                    writer.WriteStartElement("QueryOptions");
-                    foreach (var queryOption in queryOptions)
-                    {
-                        writer.WriteStartElement("QueryOption");
-                        writer.WriteAttributeString("Name", queryOption.QueryOperator);
-                        writer.WriteAttributeString("Value", queryOption.Expression);
-                        writer.WriteEndElement();
-                    }
-                    writer.WriteEndElement();
-                }
-                writer.WriteStartElement(result.OperationName, rootNamespace); // <OperationName>
-
-                // Write all parameters
-                if (parameters != null && parameters.Count > 0)
-                {
-                    foreach (var param in parameters)
-                    {
-                        writer.WriteStartElement(param.Key);  // <ParameterName>
-                        if (param.Value != null)
-                        {
-                            var serializer = GetSerializer(param.Value.GetType());
-                            serializer.WriteObjectContent(writer, param.Value);
-                        } 
-                        else
-                        {
-                            // Null input
-                            writer.WriteAttributeString("i","nil", "http://www.w3.org/2001/XMLSchema-instance", "true");
-                        }
-                        writer.WriteEndElement();            // </ParameterName>
-                    }
-                }
-
-                writer.WriteEndDocument(); // </OperationName> and </MessageRoot> if present
-                writer.Flush();
-            }
-
-            // TODO: Custom optimized implementation of StreamContent (like WebApi's PushStreamContent)?
-            // so we don't have to have special dispose logic below
-            ms.Seek(0, System.IO.SeekOrigin.Begin);
-            var content = new StreamContent(ms);
-            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/msbin1");
-
             // Keep reference to dictionary so that we can dispose of it correctly after the request has been posted
             // otherwise there is a small risk that it will be finalized and that it might corrupt the stream
-            return HttpClient.PostAsync(result.OperationName, content)
-                .ContinueWith(res =>
-                {
-                    writer.Dispose();
+            return HttpClient.PostAsync(result.OperationName, new BinaryXmlContent(this, result, parameters, queryOptions));
 
-                    return res;
-                })
-                .Unwrap();
         }
 
         /// <summary>
