@@ -14,10 +14,10 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
             private readonly WebApiDomainClient domainClient;
             private readonly string operationName;
             private readonly IDictionary<string, object> parameters;
-            private readonly IList<ServiceQueryPart> queryOptions;
+            private readonly List<ServiceQueryPart> queryOptions;
 
             public BinaryXmlContent(WebApiDomainClient domainClient,
-                string operationName, IDictionary<string, object> parameters, IList<ServiceQueryPart> queryOptions)
+                string operationName, IDictionary<string, object> parameters, List<ServiceQueryPart> queryOptions)
             {
                 this.domainClient = domainClient;
                 this.operationName = operationName;

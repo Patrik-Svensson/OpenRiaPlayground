@@ -54,7 +54,7 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
         /// </returns>
         protected override async Task<InvokeCompletedResult> InvokeCoreAsync(InvokeArgs invokeArgs, CancellationToken cancellationToken)
         {
-            var response = await ExecuteRequestAsync(invokeArgs.OperationName, invokeArgs.HasSideEffects, invokeArgs.Parameters, queryOptions: null)
+            var response = await ExecuteRequestAsync(invokeArgs.OperationName, invokeArgs.HasSideEffects, invokeArgs.Parameters, queryOptions: null, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             IEnumerable<ValidationResult> validationErrors = null;
@@ -97,7 +97,7 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
                 {"changeSet", entries}
             };
 
-            var response = await ExecuteRequestAsync(operationName, hasSideEffects: true, parameters: parameters, queryOptions: null)
+            var response = await ExecuteRequestAsync(operationName, hasSideEffects: true, parameters: parameters, queryOptions: null, cancellationToken: cancellationToken)
                 .ConfigureAwait(false);
 
             try
@@ -134,16 +134,14 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
                 });
             }
 
-
-            var response = await ExecuteRequestAsync(query.QueryName, query.HasSideEffects, query.Parameters, queryOptions)
+            var response = await ExecuteRequestAsync(query.QueryName, query.HasSideEffects, query.Parameters, queryOptions, cancellationToken)
                 .ConfigureAwait(false);
 
-            cancellationToken.ThrowIfCancellationRequested();
             IEnumerable<ValidationResult> validationErrors = null;
-
             try
             {
-                var queryResult = (QueryResult)ReadResponse(response, query.QueryName, query.EntityType);
+                var queryType = typeof(QueryResult<>).MakeGenericType(query.EntityType);
+                var queryResult = (QueryResult)ReadResponse(response, query.QueryName, queryType);
                 if (queryResult != null)
                 {
                     return new QueryCompletedResult(
@@ -183,18 +181,19 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
         /// <param name="parameters">The parameters.</param>
         /// <param name="queryOptions">The query options.</param>
         private Task<HttpResponseMessage> ExecuteRequestAsync(string operationName, bool hasSideEffects, IDictionary<string, object> parameters,
-            IList<ServiceQueryPart> queryOptions)
+            List<ServiceQueryPart> queryOptions, 
+            CancellationToken cancellationToken)
         {
             Task<HttpResponseMessage> response = null;
             // Add parameters to query string for get methods
             if (!hasSideEffects)
             {
-                response = GetAsync(operationName, parameters, queryOptions);
+                response = GetAsync(operationName, parameters, queryOptions, cancellationToken);
             }
             // It is a POST
             if (response == null)
             {
-                response = PostAsync(operationName, parameters, queryOptions);
+                response = PostAsync(operationName, parameters, queryOptions, cancellationToken);
             }
 
 
@@ -208,11 +207,11 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
         /// <param name="parameters">The parameters to the server method, or <c>null</c> if no parameters.</param>
         /// <param name="queryOptions">The query options if any.</param>
         /// <returns></returns>
-        private Task<HttpResponseMessage> PostAsync(string operationName, IDictionary<string, object> parameters, IList<ServiceQueryPart> queryOptions)
+        private Task<HttpResponseMessage> PostAsync(string operationName, IDictionary<string, object> parameters, List<ServiceQueryPart> queryOptions, CancellationToken cancellationToken)
         {
             // Keep reference to dictionary so that we can dispose of it correctly after the request has been posted
             // otherwise there is a small risk that it will be finalized and that it might corrupt the stream
-            return HttpClient.PostAsync(operationName, new BinaryXmlContent(this, operationName, parameters, queryOptions));
+            return HttpClient.PostAsync(operationName, new BinaryXmlContent(this, operationName, parameters, queryOptions), cancellationToken);
 
         }
 
@@ -223,7 +222,7 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
         /// <param name="parameters">The parameters to the server method, or <c>null</c> if no parameters.</param>
         /// <param name="queryOptions">The query options if any.</param>
         /// <returns></returns>
-        private Task<HttpResponseMessage> GetAsync(string operationName, IDictionary<string, object> parameters, IList<ServiceQueryPart> queryOptions)
+        private Task<HttpResponseMessage> GetAsync(string operationName, IDictionary<string, object> parameters, IList<ServiceQueryPart> queryOptions, CancellationToken cancellationToken)
         {
             int i = 0;
             var uriBuilder = new StringBuilder();
@@ -259,7 +258,7 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
 
             // TODO: Switch to POST if uri becomes to long, we can do so by returning nul ...l
             var uri = uriBuilder.ToString();
-            return HttpClient.GetAsync(uri);
+            return HttpClient.GetAsync(uri, cancellationToken);
         }
         #endregion
 
