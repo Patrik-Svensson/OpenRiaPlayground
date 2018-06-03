@@ -1,30 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenRiaServices.DomainServices.Client.PortableWeb
 {
-
-    public partial class WebApiDomainClient : OpenRiaServices.DomainServices.Client.DomainClient
+    public partial class WebApiDomainClient : TaskBasedDomainClient
     {
         private static readonly Dictionary<Type, Dictionary<Type, DataContractSerializer>> s_globalSerializerCache = new Dictionary<Type, Dictionary<Type, DataContractSerializer>>();
         private static readonly DataContractSerializer s_faultSerializer = new DataContractSerializer(typeof(DomainServiceFault));
         Dictionary<Type, DataContractSerializer> _serializerCache;
 
-        Type _serviceInterface;
-        HttpClient _httpClientCache;
-
         public WebApiDomainClient(Type serviceInterface, Uri baseUri, HttpMessageHandler handler)
         {
-            _serviceInterface = serviceInterface;
-            _httpClientCache = new HttpClient(handler, disposeHandler: false)
+            ServiceInterfaceType = serviceInterface;
+            HttpClient = new HttpClient(handler, disposeHandler: false)
             {
                 BaseAddress = new Uri(baseUri.AbsoluteUri + "/binary/", UriKind.Absolute),
             };
@@ -39,15 +37,9 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
             }
         }
 
-        internal Type ServiceInterfaceType { get { return _serviceInterface; } }
+        internal Type ServiceInterfaceType { get; private set; }
 
-        HttpClient HttpClient
-        {
-            get
-            {
-                return _httpClientCache;
-            }
-        }
+        HttpClient HttpClient { get; set; }
 
         #region Begin*** Methods
         /// <summary>
@@ -60,11 +52,31 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
         /// <returns>
         /// An asynchronous result that identifies this invocation.
         /// </returns>
-        protected override IAsyncResult BeginInvokeCore(InvokeArgs invokeArgs, AsyncCallback callback, object userState)
+        protected override async Task<InvokeCompletedResult> InvokeCoreAsync(InvokeArgs invokeArgs, CancellationToken cancellationToken)
         {
-            var result = WebApiDomainClientAsyncResult.CreateInvokeResult(this, invokeArgs, callback, userState);
+            var response = await ExecuteRequestAsync(invokeArgs.OperationName, invokeArgs.HasSideEffects, invokeArgs.Parameters, queryOptions: null)
+                .ConfigureAwait(false);
 
-            return BeginWebRequest(result, invokeArgs.HasSideEffects, invokeArgs.Parameters, queryOptions: null);
+            IEnumerable<ValidationResult> validationErrors = null;
+            object returnValue = null;
+
+            try
+            {
+                returnValue = ReadResponse(response, invokeArgs.OperationName, invokeArgs.ReturnType);
+            }
+            catch (FaultException<DomainServiceFault> fe)
+            {
+                if (fe.Detail.OperationErrors != null)
+                {
+                    validationErrors = fe.Detail.GetValidationErrors();
+                }
+                else
+                {
+                    throw GetExceptionFromServiceFault(fe.Detail);
+                }
+            }
+
+            return new InvokeCompletedResult(returnValue, validationErrors ?? Enumerable.Empty<ValidationResult>());
         }
 
         /// <summary>
@@ -77,15 +89,26 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
         /// <returns>
         /// An asynchronous result that identifies this submit request.
         /// </returns>
-        protected override IAsyncResult BeginSubmitCore(EntityChangeSet changeSet, AsyncCallback callback, object userState)
+        protected override async Task<SubmitCompletedResult> SubmitCoreAsync(EntityChangeSet changeSet, CancellationToken cancellationToken)
         {
-            var result = WebApiDomainClientAsyncResult.CreateSubmitResult(this, changeSet, changeSet.GetChangeSetEntries().ToList(), callback, userState);
-
+            const string operationName = "SubmitChanges";
+            var entries = changeSet.GetChangeSetEntries().ToList();
             var parameters = new Dictionary<string, object>() {
-                {"changeSet", result.ChangeSetEntries}
+                {"changeSet", entries}
             };
 
-            return BeginWebRequest(result, hasSideEffects: true, parameters: parameters, queryOptions: null);
+            var response = await ExecuteRequestAsync(operationName, hasSideEffects: true, parameters: parameters, queryOptions: null)
+                .ConfigureAwait(false);
+
+            try
+            {
+                var returnValue = (IEnumerable<ChangeSetEntry>)ReadResponse(response, operationName, typeof(IEnumerable<ChangeSetEntry>));
+                return new SubmitCompletedResult(changeSet, returnValue ?? Enumerable.Empty<ChangeSetEntry>());
+            }
+            catch (FaultException<DomainServiceFault> fe)
+            {
+                throw GetExceptionFromServiceFault(fe.Detail);
+            }
         }
 
         /// <summary>
@@ -97,9 +120,8 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
         /// <returns>
         /// An asynchronous result that identifies this query.
         /// </returns>
-        protected override IAsyncResult BeginQueryCore(EntityQuery query, AsyncCallback callback, object userState)
+        protected override async Task<QueryCompletedResult> QueryCoreAsync(EntityQuery query, CancellationToken cancellationToken)
         {
-            var result = WebApiDomainClientAsyncResult.CreateQueryResult(this, query, callback, userState);
             List<ServiceQueryPart> queryOptions = query.Query != null ? QuerySerializer.Serialize(query.Query) : null;
 
             if (query.IncludeTotalCount)
@@ -112,24 +134,16 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
                 });
             }
 
-            return BeginWebRequest(result, query.HasSideEffects, query.Parameters, queryOptions);
-        }
-        #endregion
 
-        #region End*** Methods
-        /// <summary>
-        /// Gets the result of a Query operation.
-        /// </summary>
-        /// <param name="asyncResult">An asynchronous result that identifies a query.</param>
-        /// <returns>The results returned by the query.</returns>
-        protected override QueryCompletedResult EndQueryCore(IAsyncResult asyncResult)
-        {
-            var result = this.EndAsyncResult(asyncResult, AsyncOperationType.Query, /* cancel */ false);
+            var response = await ExecuteRequestAsync(query.QueryName, query.HasSideEffects, query.Parameters, queryOptions)
+                .ConfigureAwait(false);
+
+            cancellationToken.ThrowIfCancellationRequested();
             IEnumerable<ValidationResult> validationErrors = null;
 
             try
             {
-                var queryResult = (QueryResult)ReadResponse(result, result.EndOperationMethod.ReturnType);
+                var queryResult = (QueryResult)ReadResponse(response, query.QueryName, query.EntityType);
                 if (queryResult != null)
                 {
                     return new QueryCompletedResult(
@@ -157,58 +171,8 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
                 /* totalCount */ 0,
                     validationErrors ?? Enumerable.Empty<ValidationResult>());
         }
-
-        /// <summary>
-        /// Gets the result of an Invoke operation.
-        /// </summary>
-        /// <param name="asyncResult">An asynchronous result that identifies an invocation.</param>
-        /// <returns>The results returned by the invocation.</returns>
-        protected override InvokeCompletedResult EndInvokeCore(IAsyncResult asyncResult)
-        {
-            var result = this.EndAsyncResult(asyncResult, AsyncOperationType.Invoke, /* cancel */ false);
-            IEnumerable<ValidationResult> validationErrors = null;
-            object returnValue = null;
-
-            try
-            {
-                returnValue = ReadResponse(result, result.EndOperationMethod.ReturnType);
-            }
-            catch (FaultException<DomainServiceFault> fe)
-            {
-                if (fe.Detail.OperationErrors != null)
-                {
-                    validationErrors = fe.Detail.GetValidationErrors();
-                }
-                else
-                {
-                    throw GetExceptionFromServiceFault(fe.Detail);
-                }
-            }
-
-            return new InvokeCompletedResult(returnValue, validationErrors ?? Enumerable.Empty<ValidationResult>());
-        }
-
-        /// <summary>
-        /// Gets the result of a Submit operation.
-        /// </summary>
-        /// <param name="asyncResult">An asynchronous result that identifies an invocation.</param>
-        /// <returns>The results returned by the invocation.</returns>
-        protected override SubmitCompletedResult EndSubmitCore(IAsyncResult asyncResult)
-        {
-            var result = this.EndAsyncResult(asyncResult, AsyncOperationType.Submit, /* cancel */ false);
-            var changeSet = result.EntityChangeSet;
-
-            try
-            {
-                var returnValue = (IEnumerable<ChangeSetEntry>)ReadResponse(result, typeof(IEnumerable<ChangeSetEntry>));
-                return new SubmitCompletedResult(changeSet, returnValue ?? Enumerable.Empty<ChangeSetEntry>());
-            }
-            catch (FaultException<DomainServiceFault> fe)
-            {
-                throw GetExceptionFromServiceFault(fe.Detail);
-            }
-        }
         #endregion
+
 
         #region Private methods for making requests
         /// <summary>
@@ -218,28 +182,23 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
         /// <param name="hasSideEffects">if set to <c>true</c> then the request will always be a POST operation.</param>
         /// <param name="parameters">The parameters.</param>
         /// <param name="queryOptions">The query options.</param>
-        private IAsyncResult BeginWebRequest(WebApiDomainClientAsyncResult result, bool hasSideEffects, IDictionary<string, object> parameters,
+        private Task<HttpResponseMessage> ExecuteRequestAsync(string operationName, bool hasSideEffects, IDictionary<string, object> parameters,
             IList<ServiceQueryPart> queryOptions)
         {
             Task<HttpResponseMessage> response = null;
             // Add parameters to query string for get methods
             if (!hasSideEffects)
             {
-                response = GetAsync(result, parameters, queryOptions);
+                response = GetAsync(operationName, parameters, queryOptions);
             }
             // It is a POST
             if (response == null)
             {
-                response = PostAsync(result, parameters, queryOptions);
+                response = PostAsync(operationName, parameters, queryOptions);
             }
 
-            result.InnerAsyncResult = response;
-            response.ContinueWith(task =>
-            {
-                result.Complete();
-            }, TaskContinuationOptions.ExecuteSynchronously);
 
-            return result;
+            return response;
         }
 
         /// <summary>
@@ -249,11 +208,11 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
         /// <param name="parameters">The parameters to the server method, or <c>null</c> if no parameters.</param>
         /// <param name="queryOptions">The query options if any.</param>
         /// <returns></returns>
-        private Task<HttpResponseMessage> PostAsync(WebApiDomainClientAsyncResult result, IDictionary<string, object> parameters, IList<ServiceQueryPart> queryOptions)
+        private Task<HttpResponseMessage> PostAsync(string operationName, IDictionary<string, object> parameters, IList<ServiceQueryPart> queryOptions)
         {
             // Keep reference to dictionary so that we can dispose of it correctly after the request has been posted
             // otherwise there is a small risk that it will be finalized and that it might corrupt the stream
-            return HttpClient.PostAsync(result.OperationName, new BinaryXmlContent(this, result, parameters, queryOptions));
+            return HttpClient.PostAsync(operationName, new BinaryXmlContent(this, operationName, parameters, queryOptions));
 
         }
 
@@ -264,11 +223,11 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
         /// <param name="parameters">The parameters to the server method, or <c>null</c> if no parameters.</param>
         /// <param name="queryOptions">The query options if any.</param>
         /// <returns></returns>
-        private Task<HttpResponseMessage> GetAsync(WebApiDomainClientAsyncResult result, IDictionary<string, object> parameters, IList<ServiceQueryPart> queryOptions)
+        private Task<HttpResponseMessage> GetAsync(string operationName, IDictionary<string, object> parameters, IList<ServiceQueryPart> queryOptions)
         {
             int i = 0;
             var uriBuilder = new StringBuilder();
-            uriBuilder.Append(result.OperationName);
+            uriBuilder.Append(operationName);
 
             // Parameters
             if (parameters != null && parameters.Count > 0)
@@ -314,10 +273,8 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
         /// <returns></returns>
         /// <exception cref="OpenRiaServices.DomainServices.Client.DomainOperationException">On server errors which did not produce expected output</exception>
         /// <exception cref="FaultException{DomainServiceFault}">If server returned a DomainServiceFault</exception>
-        private object ReadResponse(WebApiDomainClientAsyncResult result, Type returnType)
+        private object ReadResponse(HttpResponseMessage response, string operationName, Type returnType)
         {
-            HttpResponseMessage response = ((Task<HttpResponseMessage>)result.InnerAsyncResult).Result;
-
             if (!response.IsSuccessStatusCode)
             {
                 var message = string.Format(Resources.DomainClient_UnexpectedHttpStatusCode, (int)response.StatusCode, response.StatusCode);
@@ -330,52 +287,32 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
                     throw new DomainOperationException(message, OperationErrorStatus.ServerError, (int)response.StatusCode, null);
             }
 
-            var ms = response.Content.ReadAsStreamAsync().Result;
-            using (var reader = System.Xml.XmlDictionaryReader.CreateBinaryReader(ms, System.Xml.XmlDictionaryReaderQuotas.Max))
+            var streamTask = response.Content.ReadAsStreamAsync();
+            Debug.Assert(streamTask.IsCompleted, "Get/Post should use buffering so tream is ready");
+            var stream = streamTask.Result;
+
+            using (var reader = System.Xml.XmlDictionaryReader.CreateBinaryReader(stream, System.Xml.XmlDictionaryReaderQuotas.Max))
             {
                 reader.Read();
 
                 // Domain Fault
                 if (reader.LocalName == "Fault")
                 {
-                    throw ReadFaultException(reader, result.OperationName);
+                    throw ReadFaultException(reader, operationName);
                 }
                 else
                 {
                     // Validate that we are no on ****Response node
-                    VerifyReaderIsAtNode(reader, result.OperationName, "Response");
+                    VerifyReaderIsAtNode(reader, operationName, "Response");
                     reader.ReadStartElement(); // Read to next which should be ****Result
 
                     // Validate that we are no on ****Result node
-                    VerifyReaderIsAtNode(reader, result.OperationName, "Result");
+                    VerifyReaderIsAtNode(reader, operationName, "Result");
 
                     var serializer = GetSerializer(returnType);
                     return serializer.ReadObject(reader, verifyObjectName: false);
                 }
             }
-        }
-
-        /// <summary>
-        /// Transitions an <see cref="IAsyncResult"/> instance to a completed state.
-        /// </summary>
-        /// <param name="asyncResult">An asynchronous result that identifies an invocation.</param>
-        /// <param name="operationType">The expected operation type.</param>
-        /// <param name="cancel">Boolean indicating whether or not the operation has been canceled.</param>
-        /// <returns>A <see cref="WebDomainClientAsyncResult&lt;TContract&gt;"/> reference.</returns>
-        /// <exception cref="ArgumentNullException"> if <paramref name="asyncResult"/> is null.</exception>
-        /// <exception cref="ArgumentException"> if <paramref name="asyncResult"/> is not of type <cref name="TAsyncResult"/>.</exception>
-        /// <exception cref="InvalidOperationException"> if <paramref name="asyncResult"/> has been canceled.</exception>
-        /// <exception cref="InvalidOperationException"> if <paramref name="asyncResult"/>'s End* method has already been invoked.</exception>
-        /// <exception cref="InvalidOperationException"> if <paramref name="asyncResult"/> has not completed.</exception>
-        private WebApiDomainClientAsyncResult EndAsyncResult(IAsyncResult asyncResult, AsyncOperationType operationType, bool cancel)
-        {
-            var clientResult = asyncResult as WebApiDomainClientAsyncResult;
-            if ((clientResult != null) && (!object.ReferenceEquals(this, clientResult.DomainClient) || clientResult.AsyncOperationType != operationType))
-            {
-                throw new ArgumentException(Resources.WrongAsyncResult, "asyncResult");
-            }
-
-            return AsyncResultBase.EndAsyncOperation<WebApiDomainClientAsyncResult>(asyncResult, cancel);
         }
 
         /// <summary>
