@@ -15,7 +15,7 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
             protected abstract Task InnerTask { get; }
 
             #region IAsyncResult implementation forwarded to Task implementation
-            object IAsyncResult.AsyncState => InnerTask.AsyncState;
+            object IAsyncResult.AsyncState => State;
             WaitHandle IAsyncResult.AsyncWaitHandle => ((IAsyncResult)InnerTask).AsyncWaitHandle;
             bool IAsyncResult.CompletedSynchronously => ((IAsyncResult)InnerTask).CompletedSynchronously;
             bool IAsyncResult.IsCompleted => InnerTask.IsCompleted;
