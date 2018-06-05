@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
 using System.Windows;
 using OpenRiaServices.DomainServices.Client;
 using OpenRiaServices.DomainServices.Client.ApplicationServices;
@@ -21,15 +20,6 @@ namespace HttpClientExampleClient
         public App()
         {
             this.Startup += App_Startup;
-        }
-
-        public class Http2CustomHandler : WinHttpHandler
-        {
-            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
-            {
-                request.Version = new Version("2.0");
-                return base.SendAsync(request, cancellationToken);
-            }
         }
 
         private void App_Startup(object sender, StartupEventArgs e)
@@ -66,12 +56,7 @@ namespace HttpClientExampleClient
             };
 
 
-            DomainContext.DomainClientFactory = new SoapDomainClientFactory()
-            {
-                // Uncomment this to debug in fiddler
-                 ServerBaseUri = new Uri("http://localhost.fiddler:51359/ClientBin/", UriKind.Absolute)
-                //ServerBaseUri = new Uri("http://localhost:51359/ClientBin/", UriKind.Absolute)
-            };
+            
             */
 
             // Create a WebContext and add it to the ApplicationLifetimeObjects collection.

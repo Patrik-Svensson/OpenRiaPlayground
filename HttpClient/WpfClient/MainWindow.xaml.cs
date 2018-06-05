@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using OpenRiaServices.DomainServices.Client;
 using OpenRiaServices.DomainServices.Client.ApplicationServices;
+using OpenRiaServices.DomainServices.Client.PortableWeb;
 using TestDomainServices;
 
 namespace HttpClientExampleClient
@@ -251,7 +253,7 @@ namespace HttpClientExampleClient
 
         private void OpenRiaPortableWeb_Click(object sender, RoutedEventArgs e)
         {
-            DomainContext.DomainClientFactory = new OpenRiaServices.DomainServices.Client.PortableWeb.WebApiDomainClientFactory()
+            DomainContext.DomainClientFactory = new WebApiDomainClientFactory()
             {
                 ServerBaseUri = GetServerBaseUri(),
                 HttpClientHandler = new System.Net.Http.HttpClientHandler()
@@ -269,8 +271,38 @@ namespace HttpClientExampleClient
 #if SILVERLIGHT
             return Application.Current.Host.Source;
 #else
-            return new Uri("http://localhost:51359/ClientBin/", UriKind.Absolute);
+            return new Uri("https://localhost:44300/ClientBin/", UriKind.Absolute);
 #endif
+        }
+
+        private void OpenRiaPortableWebWinHttp_Click(object sender, RoutedEventArgs e)
+        {
+
+            // Enable HTTP/2 support
+            DomainContext.DomainClientFactory = new WebApiDomainClientFactory()
+            {
+                ServerBaseUri = GetServerBaseUri(),
+                HttpClientHandler = new Http2CustomHandler()
+                {
+                    CookieContainer = _cookieContainer, 
+                    CookieUsePolicy = CookieUsePolicy.UseSpecifiedCookieContainer,
+                    AutomaticDecompression = System.Net.DecompressionMethods.Deflate | System.Net.DecompressionMethods.GZip,
+                    WindowsProxyUsePolicy = WindowsProxyUsePolicy.UseWinInetProxy,
+                },
+            };
+            SetupNewDomainContext();
+        }
+
+        private void WcfSoapClient_Click(object sender, RoutedEventArgs e)
+        {
+            if (((RadioButton)sender).IsChecked != true)
+                return;
+
+            DomainContext.DomainClientFactory = new OpenRiaServices.DomainServices.Client.Web.SoapDomainClientFactory()
+            {
+                ServerBaseUri = GetServerBaseUri(),
+            };
+            SetupNewDomainContext();
         }
     }
 }
