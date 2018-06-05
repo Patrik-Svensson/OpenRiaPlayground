@@ -12,15 +12,15 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
         class BinaryXmlContent : HttpContent
         {
             private readonly WebApiDomainClient domainClient;
-            private readonly WebApiDomainClientAsyncResult result;
+            private readonly string operationName;
             private readonly IDictionary<string, object> parameters;
-            private readonly IList<ServiceQueryPart> queryOptions;
+            private readonly List<ServiceQueryPart> queryOptions;
 
             public BinaryXmlContent(WebApiDomainClient domainClient,
-                WebApiDomainClientAsyncResult res, IDictionary<string, object> parameters, IList<ServiceQueryPart> queryOptions)
+                string operationName, IDictionary<string, object> parameters, List<ServiceQueryPart> queryOptions)
             {
                 this.domainClient = domainClient;
-                this.result = res;
+                this.operationName = operationName;
                 this.parameters = parameters;
                 this.queryOptions = queryOptions;
 
@@ -48,7 +48,7 @@ namespace OpenRiaServices.DomainServices.Client.PortableWeb
                     }
                     writer.WriteEndElement();
                 }
-                writer.WriteStartElement(result.OperationName, rootNamespace); // <OperationName>
+                writer.WriteStartElement(operationName, rootNamespace); // <OperationName>
 
                 // Write all parameters
                 if (parameters != null && parameters.Count > 0)

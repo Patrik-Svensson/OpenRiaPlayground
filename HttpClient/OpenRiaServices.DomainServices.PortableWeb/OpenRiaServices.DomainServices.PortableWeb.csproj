@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>netstandard1.3;net45;portable-net45+sl5+win8</TargetFrameworks>
+    <!--<TargetFrameworks>netstandard1.3;net45;portable-net45+sl5+win8</TargetFrameworks>-->
+    <TargetFrameworks>netstandard1.3;net46</TargetFrameworks>
     <!--<TargetFrameworks>sl5</TargetFrameworks>-->
     <AssemblyName>OpenRiaServices.DomainServices.PortableWeb</AssemblyName>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
@@ -54,7 +55,7 @@
     <Reference Include="System.Windows" />
     <Reference Include="System.Xml" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.ServiceModel" />
